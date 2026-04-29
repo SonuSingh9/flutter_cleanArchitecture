@@ -40,6 +40,8 @@ class _LoginPageState extends State<LoginPage> {
           listener: (context, state) {
             if (state is AuthFailure) {
               showSnackBar(context, state.message);
+            } else if (state is AuthSucess) {
+              showSnackBar(context, 'Logged in as ${state.user.email}');
             }
           },
           builder: (context, state) {

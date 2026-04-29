@@ -1,5 +1,3 @@
-import 'package:blog_app/features/auth/data/models/user_models.dart';
-
 class User {
   final String id;
   final String email;
