@@ -7,6 +7,7 @@ final String content;
 final String imageUrl;
 final List<String> topics;
 final DateTime updatedAt;
+final String? posterName;
   Blog({
     required this.id,
     required this.posterId,
@@ -15,6 +16,7 @@ final DateTime updatedAt;
     required this.imageUrl,
     required this.topics,
     required this.updatedAt,
+    this.posterName
   });
 
   Map<String, dynamic> toMap() {

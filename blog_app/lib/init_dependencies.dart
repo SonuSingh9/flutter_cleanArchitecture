@@ -10,8 +10,9 @@ import 'package:blog_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:blog_app/features/blog/data/dataSources/blog_remote_data_sources.dart';
 import 'package:blog_app/features/blog/data/repositories/blog_repository_impl.dart';
 import 'package:blog_app/features/blog/domain/repositories/blog_repository.dart';
+import 'package:blog_app/features/blog/domain/usecases/get_all_blogs.dart';
 import 'package:blog_app/features/blog/domain/usecases/upload_blog.dart';
-import 'package:blog_app/features/blog/presentation/pages/bloc/blog_bloc.dart';
+import 'package:blog_app/features/blog/presentation/bloc/blog_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -57,12 +58,16 @@ void _initAuth() {
 
 void _initBlog() {
   serviceLocator
-    ..registerFactory<BlogRemoteDataSourceImpl>(
+    ..registerFactory<BlogRemoteDataSources>(
       () => BlogRemoteDataSourceImpl(serviceLocator()),
     )
     ..registerFactory<BlogRepository>(
       () => BlogRepositoryImpl(serviceLocator()),
     )
     ..registerFactory(() => UploadBlog(serviceLocator()))
-    ..registerFactory(() => BlogBloc(serviceLocator()));
+    ..registerFactory(() => GetAllBlogs(serviceLocator()))
+    ..registerLazySingleton(
+      () =>
+          BlogBloc(uploadBlog: serviceLocator(), getAllBlogs: serviceLocator()),
+    );
 }

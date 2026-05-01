@@ -9,16 +9,17 @@ class BlogModel extends Blog {
     required super.imageUrl,
     required super.topics,
     required super.updatedAt,
+    super.posterName
   });
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
-      'id': 'id',
-      'poster_id': 'posterId',
-      'title': 'title',
-      'content': 'content',
-      'image_url': 'imageUrl',
-      'topics': 'topics',
+      'id': id,
+      'poster_id': posterId,
+      'title': title,
+      'content': content,
+      'image_url': imageUrl,
+      'topics': topics,
       'updated_at': updatedAt.toIso8601String(),
     };
   }
@@ -45,6 +46,7 @@ class BlogModel extends Blog {
     String? imageUrl,
     List<String>? topics,
     DateTime? updatedAt,
+    String? posterName
   }) {
     return BlogModel(
       id: id ?? this.id,
@@ -54,6 +56,7 @@ class BlogModel extends Blog {
       imageUrl: imageUrl ?? this.imageUrl,
       topics: topics ?? this.topics,
       updatedAt: updatedAt ?? this.updatedAt,
+      posterName: posterName ?? this.posterName
     );
   }
 }
