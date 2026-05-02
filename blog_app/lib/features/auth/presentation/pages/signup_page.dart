@@ -5,6 +5,7 @@ import 'package:blog_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:blog_app/features/auth/presentation/pages/login_page.dart';
 import 'package:blog_app/features/auth/presentation/widgets/auth_feild.dart';
 import 'package:blog_app/features/auth/presentation/widgets/auth_gradient_button.dart';
+import 'package:blog_app/features/blog/presentation/pages/blog_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -38,12 +39,12 @@ class _SignupPageState extends State<SignupPage> {
       appBar: AppBar(),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
-          if(state is AuthFailure){
+          if (state is AuthFailure) {
             showSnackBar(context, state.message);
           }
         },
         builder: (context, state) {
-          if(state is AuthLoading){
+          if (state is AuthLoading) {
             return const Loader();
           }
           return SingleChildScrollView(
@@ -79,8 +80,10 @@ class _SignupPageState extends State<SignupPage> {
                             SnackBar(content: Text(state.message)),
                           );
                         } else if (state is AuthSucess) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Account created!')),
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            BlogPage.route(),
+                            (route) => false,
                           );
                         }
                       },

@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:blog_app/core/error/exception.dart';
 import 'package:blog_app/core/error/failures.dart';
+import 'package:blog_app/core/network/connection_checker.dart';
+import 'package:blog_app/features/blog/data/dataSources/blog_local_data_sources.dart';
 import 'package:blog_app/features/blog/data/dataSources/blog_remote_data_sources.dart';
 import 'package:blog_app/features/blog/data/model/blog_model.dart';
 import 'package:blog_app/features/blog/domain/entities/blog.dart';
@@ -11,7 +13,13 @@ import 'package:uuid/uuid.dart';
 
 class BlogRepositoryImpl implements BlogRepository {
   final BlogRemoteDataSources blogRemoteDataSources;
-  BlogRepositoryImpl(this.blogRemoteDataSources);
+  final BlogLocalDataSources blogLocalDataSources;
+  final ConnectionChecker connectionChecker;
+  BlogRepositoryImpl(
+    this.blogRemoteDataSources,
+    this.blogLocalDataSources,
+    this.connectionChecker,
+  );
   @override
   Future<Either<Failure, Blog>> uploadBlog({
     required File image,
@@ -21,6 +29,9 @@ class BlogRepositoryImpl implements BlogRepository {
     required List<String> topics,
   }) async {
     try {
+      if (!await connectionChecker.isConnected) {
+        return left(Failure('No internet connection'));
+      }
       BlogModel blogModel = BlogModel(
         id: const Uuid().v1(),
         posterId: posterId,
@@ -34,23 +45,26 @@ class BlogRepositoryImpl implements BlogRepository {
         image: image,
         blog: blogModel,
       );
-      blogModel = blogModel.copyWith(
-        imageUrl: imageUrl
-      );
+      blogModel = blogModel.copyWith(imageUrl: imageUrl);
       final blogUploaded = await blogRemoteDataSources.uploadBlog(blogModel);
       return right(blogUploaded);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }
   }
-  
+
   @override
-  Future<Either<Failure, List<Blog>>> getAllBlogs() async{
-    try{
+  Future<Either<Failure, List<Blog>>> getAllBlogs() async {
+    try {
+       if (!await connectionChecker.isConnected) {
+        final blogs = blogLocalDataSources.loadBlogs();
+        return right(blogs);
+      }
       final blogs = await blogRemoteDataSources.getAllBlogs();
+      blogLocalDataSources.uploadLocalBlogs(blogs: blogs);
       return right(blogs);
-    }on ServerException catch(e){
-      return left(Failure(e.message),);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
     }
   }
 }
